@@ -2,6 +2,7 @@
 <p align="center">
 <img src="docs/img/Forecast.gif" title="RNN Forecast" alt="RNN Forecast" width="800"/>
 </p>
+
 ## Overview
 I wrote classes in Python 3.7 that represent digital and analog circuit elements, and combined those classes together to create a system that generates time series data.  I compared the performance of two types of Recurrent Neural Networks trained on the time series data.  A **requirements.txt** file is included.  The Python files of interest are:
 
@@ -28,6 +29,7 @@ I was inspired by Andrew Ng's very popular machine learning course on Coursera t
 <p align="center">
 <img src="docs/img/NAND Gate.png" title="NAND Gate" alt="NAND Gate" width="800"/>
 </p>
+
 The NAND gate is itself classified as a "universal gate."  The NAND gate can be combined with itself to represent any other logic gate.  And more than that, the NAND gate has the property of [functional completeness](https://en.wikipedia.org/wiki/NAND_logic) which means that *any Boolean function* can be recreated solely using NAND gates.  In a sense, the NAND gate is to digital logic what a hidden neuron is to function approximation.  I thought that it would be a fun exercise to implement the NAND gate as a Python class, and use it as a building block to create more complicated digital logic circuits. 
 
 I used [Deeds](https://www.digitalelectronicsdeeds.com/deeds.html) (Digital Electronics Education and Design Suite) to draw the NAND gate along with its truth table shown in the image above.  The NAND gate outputs HIGH unless all of its inputs are HIGH; it is the opposite of an AND gate (NOT AND). 
@@ -36,6 +38,7 @@ I used [Deeds](https://www.digitalelectronicsdeeds.com/deeds.html) (Digital Elec
 <p align="center">
 <img src="docs/img/DLatch.png" title="D-Latch" alt="D-Latch" width="800"/>
 </p>
+
 The D-Latch can store a bit/state (HIGH or LOW) in memory, which is necessary to create a sequential circuit.  The NAND gate implementation of a D-Latch is shown in the top-left section of the image above, and the D-Latch equivalent circuit symbol is shown in the bottom-left.  The D-Latch shown here is constructed using 3-input NAND gates to implement the PRESET and CLEAR functionality.  The Python `NAND()` class uses 2-input NAND gates and assumes PRESET and CLEAR are always HIGH.  The values of Q and Q<sub>Bar</sub> are `NAND()` instance variables and can be directly changed to replicate the functionality of the PRESET and CLEAR pins.
 
 Otherwise, the Python `DLatch()` class uses class composition to construct the D-Latch using five NAND gates exactly as shown in the schematic. The D-Latch truth table is simple; when the enable input is HIGH the output Q matches the data input (D).  When enable is LOW, the output remains at its previous state. 
@@ -44,18 +47,21 @@ Otherwise, the Python `DLatch()` class uses class composition to construct the D
 <p align="center">
 <img src="docs/img/DFlipFlop.png" title="D Flip-Flop" alt="D Flip-Flop" width="800"/>
 </p>
+
 The difference between a D-Latch and a D Flip-Flop is that the latch is level sensitive, while the flip-flop is edge triggered.  An edge-triggered flip-flop is required to implement a shift register and store multiple bits in memory.  If D-Latches are used instead, the input bit propagates through the entire shift register every clock cycle, causing an output of either '1111 1111' or '0000 0000'.  A D flip-flop can be implemented with two D-Latches and a NAND gate inverter as shown in the image above.  The flip-flop circuit symbol looks the same as the D-Latch except for the clock pin (Ck) instead of the enable pin (En).  The flip-flop truth table is the same as the D-Latch except that it is triggered by the clock's rising/falling edge as shown by the up/down arrows.  The flip-flop shown is positive edge triggered (PET).  For this exercise I am assuming that the time series data is sampled synchronously with the clock, and so the flip-flop class simulates a full clock cycle (rising and falling transition) whenever it is clocked.
 
 ### Shift Register
 <p align="center">
 <img src="docs/img/ShiftRegister.png" title="Shift Register" alt="Shift Register" width="800"/>
 </p>
+
 The D flip-flops can be cascaded together to store multiple bits in memory.  The schematic above shows an 8-bit SIPO (Serial In Parallel Out) shift register implemented with flip-flops, and its equivalent circuit symbol below.  Input bits propagate sequentially through each flip-flop every clock cycle (LOW/HIGH transition).  Each bit in memory is accessible simultaneously in a parallel fashion. 
 
 ### Digital-to-Analog Converter (DAC)
 <p align="center">
 <img src="docs/img/DAC.png" title="DAC" alt="DAC" width="800"/>
 </p>
+
 Now that the shift register is implemented, something interesting needs to be done with the bits in memory.  A digital-to-analog converter (DAC) transforms binary data into an analog output voltage.  I wrote a Python class that accepts a list of bits and converts them to an analog voltage using [offset binary](https://en.wikipedia.org/wiki/Offset_binary).  For an 8-bit DAC the result looks similar to the schematic above.  The 8-bit binary input will be converted into a number between -128 (0000 0000) and +127 (1111 1111), and that number will be divided by 128 and multiplied by a reference voltage.  The output will thus be 256 discrete values ranging from VRef * (-128/128) Volts to VRef * (127/128) Volts.
 
 ## Analog Circuits
@@ -65,6 +71,7 @@ This is a good start for generating time series data, but the circuit doesn't re
 <p align="center">
 <img src="docs/img/RC_Circuit.png" title="RC Circuit" alt="RC Circuit" width="800"/>
 </p>
+
 Currently, the output of the circuit relies only on the eight most recent inputs.  I added an RC circuit to the output of the DAC so that the current output also relies on the *previous* output.  An RC circuit is composed of a series resistor and capacitor, as shown in the [LTspice](https://www.analog.com/en/design-center/design-tools-and-calculators/ltspice-simulator.html) schematic above.  When a voltage is applied to an RC circuit, the capacitor draws current and develops a voltage across its terminals that increases over time.  Similarly, when the applied voltage is removed (or decreased) the capacitor discharges current and the voltage across its terminals decreases over time.  The time required to fully charge or discharge the capacitor depends on its time constant tau, which is the product of R times C in units of seconds.  A duration of five time constants (5 * tau) is approximately the time required to fully charge or discharge the capacitor.
 
 The LTspice plot above shows the RC circuit charging and discharging when a square wave voltage is applied to the circuit.  The voltage across the capacitor at some time t is calculated according to the equation:
@@ -105,6 +112,7 @@ Trainable params: 51,051
 Non-trainable params: 0
 _________________________________________________________________
 ```
+
 <p align="center">
 <img src="docs/img/tau1/Training_Loss.png" title="Training Loss" alt="Training Loss" width="800"/>
 </p>

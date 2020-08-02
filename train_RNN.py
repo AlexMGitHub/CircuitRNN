@@ -53,6 +53,13 @@ from keras.models import load_model
 #%% Functions
 def generate_data(nbits=8, tau=1, seed=1, noise_std = 0.2, data_len=2**16,
                   plot_pts=100):
+    """Function creates a circuit composed of a shift register, a DAC, and an 
+    RC circuit.  The shift register is fed a random bit (0 or 1) every clock
+    cycle.  The output of the shift register is fed into the DAC, which outputs
+    an analog voltage that has AWGN applied to it.  The noisy voltage is then
+    applied to an RC circuit.  Returns a list of the input bits and a list of
+    the RC circuit's output voltage.
+    """
     dac8 = circuit.DAC(nbits=nbits)
     sr = circuit.ShiftRegister(nbits=nbits)
     rc = circuit.RC_Circuit(tau=tau)

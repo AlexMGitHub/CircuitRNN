@@ -32,7 +32,7 @@ protobuf==3.12.3
 pyasn1==0.4.8
 pyasn1-modules==0.2.7
 pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
-PyJWT==1.7.1
+PyJWT==2.4.0
 pyOpenSSL @ file:///tmp/build/80754af9/pyopenssl_1594392929924/work
 pyparsing==2.4.7
 PySocks @ file:///tmp/build/80754af9/pysocks_1594394576006/work
